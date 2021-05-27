@@ -11,6 +11,7 @@ Will update the algorithms and documentations along development.
 ## To-dos
 - [x] Development doc: https://victomteng1997.github.io/2021/05/20/ROS2-encryption-design/ 
 - [ ] Update development doc (terms, algorithms, designs)
+- [ ] Add requirements.txt
 - [ ] Massive tests on different formats of messages
 - [ ] ROS2 Integration: code integration
 - [ ] ROS2 Integration: 
