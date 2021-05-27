@@ -1,0 +1,16 @@
+From: sender@example.dom
+To: recipient@example.dom
+Subject: M2Crypto S/MIME testing
+MIME-Version: 1.0
+Content-Disposition: attachment; filename="smime.p7m"
+Content-Type: application/x-pkcs7-mime; smime-type=enveloped-data; name="smime.p7m"
+Content-Transfer-Encoding: base64
+
+MIIBSAYJKoZIhvcNAQcDoIIBOTCCATUCAQAxgfIwge8CAQAwWDBAMQswCQYDVQQG
+EwJTRzETMBEGA1UECAwKU29tZS1TdGF0ZTENMAsGA1UECgwEdGVzdDENMAsGA1UE
+AwwEdGVzdAIUe7fRWztGaSgh1MW5P8pKJ7sme2MwDQYJKoZIhvcNAQEBBQAEgYBP
+g0p+kvS3pCJQbDLbQJUpnk61/dLYK3qJyl8lr6CEU4YivrCIpdZpnfgRejiKNHBK
+n6nY4KfqHdeo1ahGxdhOaiDcWJ0UH3NHGKK4DsVH6hp5B5JW1FM5ELeFgXADKWlZ
+4vNQ0OdLWi88fhoQMNrxvd7/zfphLBbzaIZxSUq0bDA7BgkqhkiG9w0BBwEwFAYI
+KoZIhvcNAwcECLwE6GMojEa8gBhO9nV8Dedl/iJiDu7/FkQY/qTLDIC4iaA=
+
