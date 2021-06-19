@@ -1,25 +1,37 @@
 # Create Keybase
-mkdir ~/aws_model_keystore
-cd ~/aws_model_keystore
+mkdir ~/aws_model_keystore 
+
+cd ~/aws_model_keystore 
+
 ros2 security create_keystore demo_keys
 
+ros2 security create_key demo_keys /pub_sub/talker 
 
-ros2 security create_key demo_keys /pub_sub/talker
-ros2 security create_key demo_keys /pub_sub/robot_1
-ros2 security create_key demo_keys /pub_sub/robot_2
-ros2 security create_key demo_keys /pub_sub/robot_3
+ros2 security create_key demo_keys /pub_sub/robot_1 
+
+ros2 security create_key demo_keys /pub_sub/robot_2 
+
+ros2 security create_key demo_keys /pub_sub/robot_3 
 
 # export section
-export ROS_SECURITY_KEYSTORE=~/aws_model_keystore/demo_keys
-export ROS_SECURITY_ENABLE=true
-export ROS_SECURITY_STRATEGY=Enforce
-export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+export ROS_SECURITY_KEYSTORE=~/aws_model_keystore/demo_keys 
+
+export ROS_SECURITY_ENABLE=true 
+
+export ROS_SECURITY_STRATEGY=Enforce 
+
+export RMW_IMPLEMENTATION=rmw_fastrtps_cpp 
+
 
 # create policy
-ros2 security create_permission demo_keys /pub_sub/talker policies/sample.policy.xml
-ros2 security create_permission demo_keys /pub_sub/robot_1 policies/sample.policy.xml
-ros2 security create_permission demo_keys /pub_sub/robot_2 policies/sample.policy.xml
+ros2 security create_permission demo_keys /pub_sub/talker policies/sample.policy.xml 
+
+ros2 security create_permission demo_keys /pub_sub/robot_1 policies/sample.policy.xml 
+
+ros2 security create_permission demo_keys /pub_sub/robot_2 policies/sample.policy.xml 
+
 ros2 security create_permission demo_keys /pub_sub/robot_3 policies/sample.policy.xml
+
 
 # Policy Files
 Sample.policy.xml
