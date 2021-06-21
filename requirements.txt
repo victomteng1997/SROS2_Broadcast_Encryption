@@ -1,0 +1,5 @@
+# need to install python3-dev with: apt-get install build-essential libssl-dev swig python3-dev
+ecdsa~=0.17.0
+M2Crypto~=0.38.0
+eciespy~=0.3.10
+
