@@ -19,4 +19,13 @@ ros2 run py_pubsub ROS2_perf_test --ros-args --enclave /talker_listener/testNode
 ```
 
 ## to run ROS2 without SROS2, with proposed defense.
+```
+ros2 run py_pubsub ROS2_perf_test_enc
+```
+
+## to run with both:
+```
+ros2 run py_pubsub ROS2_perf_test_enc --ros-args --enclave /talker_listener/testNode            
+```
+
 
