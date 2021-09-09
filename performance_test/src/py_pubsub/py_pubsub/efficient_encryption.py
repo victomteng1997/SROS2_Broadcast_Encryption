@@ -5,7 +5,7 @@ import binascii
 import os
 #from M2Crypto import BIO, Rand, SMIME, X509
 #from x509_modules import x509_encrypt, x509_decrypt
-from ecc_modules import ecc_encrypt, ecc_decrypt
+from .ecc_modules import ecc_encrypt, ecc_decrypt
 import random
 import string
 import hashlib
@@ -23,7 +23,7 @@ class EfficientBroadcastEncryption():
         ## 1. sig-gen
         sk = SigningKey.generate()  #
         vk = sk.verifying_key
-        print(vk.to_string())
+        #print(vk.to_string())
 
         ## 2. choose a random symmetric K.
         key = os.urandom(32)
@@ -82,9 +82,10 @@ class EfficientBroadcastEncryption():
             # message is not for this recipient. Return False
             return False
         try:
-            p = ecc_decrypt('keyfiles/0_key.pem', cj)
+            p = ecc_decrypt('/home/gelei/SROS2_Broadcast_Encryption/performance_test/src/py_pubsub/py_pubsub/keyfiles/0_key.pem', cj)
         except:
             # decryption failed
+            print("decryption failed")
             return False
 
         ## parse p as vk||x||K
@@ -122,7 +123,7 @@ def cipher_plain_ratio_unit_test():
         ciphertext = EncryptionModel.encrypt(M, S)
         result = EncryptionModel.decrypt(ciphertext)
         print(len(ciphertext), i)
-
+'''
 cipher_plain_ratio_unit_test()
 
 S = [('keyfiles/0_public.pem', 5),('keyfiles/1_public.pem', 6)] # test public key
@@ -135,3 +136,4 @@ ciphertext = EncryptionModel.encrypt(M, S)
 result = EncryptionModel.decrypt(ciphertext)
 
 print(result)
+'''
