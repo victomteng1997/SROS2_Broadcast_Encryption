@@ -85,7 +85,6 @@ class EfficientBroadcastEncryption():
             p = ecc_decrypt('/home/gelei/SROS2_Broadcast_Encryption/performance_test/src/py_pubsub/py_pubsub/keyfiles/0_key.pem', cj)
         except:
             # decryption failed
-            print("decryption failed")
             return False
 
         ## parse p as vk||x||K

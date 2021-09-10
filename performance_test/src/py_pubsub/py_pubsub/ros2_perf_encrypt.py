@@ -20,6 +20,8 @@ import hashlib
 import pickle
 import codecs
 
+import os
+import psutil
 
 
 
@@ -29,8 +31,8 @@ class testNode(Node):
         super().__init__('testNode')
         
         self.publisher_ = self.create_publisher(String, 'topic', 10)
-        timer_period = 0.01  # seconds
-        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.timer_period = 0.001  # seconds
+        self.timer = self.create_timer(self.timer_period, self.timer_callback)
         self.EncryptionModel = EfficientBroadcastEncryption()
         
         # test_related
@@ -40,11 +42,19 @@ class testNode(Node):
         self.false = 0.0
         self.encryption_time = 0.0
         self.decryption_time = 0.0
+        self.msg = String()
+        self.avg_mem = 0.0
+        self.avg_cpu = 0.0
+        self.data_point_num = 0
         
+        # performance_related
+        name = 'ROS2_perf_test_'
+        for proc in psutil.process_iter():
+            if proc.name() == name:
+                self.python_process = proc
+        self.data_point_num = 0
         
         # hardcoded
-        self.msg = String()
-        self.msg.data = 'Hello World'
         self.S = [('/home/gelei/SROS2_Broadcast_Encryption/performance_test/src/py_pubsub/py_pubsub/keyfiles/0_public.pem', 5),('/home/gelei/SROS2_Broadcast_Encryption/performance_test/src/py_pubsub/py_pubsub/keyfiles/1_public.pem', 6)] # test public key
         
 
@@ -71,11 +81,25 @@ class testNode(Node):
         before_decryption = time.time()
         result = self.EncryptionModel.decrypt(data.data)
         self.decryption_time += time.time() - before_decryption
-        if result.decode("utf-8") != self.msg.data:
+        if result.decode("utf-8") != self.raw:
             self.false += 1
         if self.sent %100 == 0:
-            print('time', self.total_time / float(self.sent), 'rate', self.received/self.sent, 'missed', self.false)
+            self.data_point_num += 1.0
+            print('time', self.total_time / float(self.sent), 'rate', self.received/self.sent, 'missed', self.false/self.sent)
             print('encryption time', self.encryption_time / float(self.sent), 'decryption time', self.decryption_time / float(self.sent))
+            cpu_usage = self.python_process.cpu_percent()
+            print('cpu usage', cpu_usage)
+            self.avg_cpu += cpu_usage
+            memoryUse = self.python_process.memory_info()[0]/2.**20  
+            print('memory use:', memoryUse)
+            self.avg_mem += memoryUse
+            
+        if self.sent > 60*(1/self.timer_period):
+            print("Final Result")
+            print("-------------------------------------------------------------")
+            print('time', self.total_time / float(self.sent), 'rate', self.received/self.sent, 'missed', self.false)
+            print('avg cpu', self.avg_cpu / self.data_point_num, 'avg mem', self.avg_mem / self.data_point_num)
+            self.destroy_node()
 
     def get_random_string(self, length):
         # choose from all lowercase letter
@@ -86,14 +110,14 @@ class testNode(Node):
                
         
     def timer_callback(self):
-        msg = String()
-        msg.data = self.get_random_string(1024)
+        rawdata = self.get_random_string(1024)
+        self.raw = rawdata
         before_encryption = time.time()
-        ciphertext = self.EncryptionModel.encrypt(str.encode(self.msg.data), self.S)
+        ciphertext = self.EncryptionModel.encrypt(str.encode(rawdata), self.S)
         self.encryption_time += time.time() - before_encryption
-        msg.data = ciphertext
+        self.msg.data = ciphertext
 
-        self.publisher_.publish(msg)
+        self.publisher_.publish(self.msg)
         # self.get_logger().info('Publishing: "%s"' % msg.data)
         self.sent += 1
         self.send_time = time.time()
