@@ -24,6 +24,9 @@ setup(
              'listener = py_pubsub.subscriber_member_function:main',
              'ROS2_perf_test = py_pubsub.ros2_perf:main',
              'ROS2_perf_test_enc = py_pubsub.ros2_perf_encrypt:main',
+             'ROS2_perf_test_4 = py_pubsub.ros2_perf_4:main',
+             'ROS2_perf_test_frequency = py_pubsub.ros2_perf_frequency:main',
+             'ROS2_perf_test_enc_frequency = py_pubsub.ros2_perf_encrypt_frequency:main',
         ],
     },
 )

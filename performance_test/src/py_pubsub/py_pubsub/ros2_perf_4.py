@@ -16,9 +16,12 @@ class testNode(Node):
     def __init__(self, nodename):
         super().__init__(nodename)
         
-        number_of_topics = 1
+        number_of_topics = 4
         
-        self.publisher_ = self.create_publisher(String, 'topic', 10)
+        self.publisher_1 = self.create_publisher(String, 'topic1', 10)
+        self.publisher_2 = self.create_publisher(String, 'topic2', 10)
+        self.publisher_3 = self.create_publisher(String, 'topic3', 10)
+        self.publisher_4 = self.create_publisher(String, 'topic4', 10)
         self.timer_period = 0.05  # seconds
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
         self.S = [('keyfiles/0_public.pem', 5),('keyfiles/1_public.pem', 6)]
@@ -36,18 +39,35 @@ class testNode(Node):
         # performance_related
         name = 'ROS2_perf_test'
         for proc in psutil.process_iter():
-            if proc.name() == name:
+            if name in proc.name():
                 self.python_process = proc
 
         # Create the subscriber. This subscriber will receive an Image
         # from the video_frames topic. The queue size is 10 messages.
-        self.subscription = self.create_subscription(
+        self.subscription_1 = self.create_subscription(
           String, 
-          'topic', 
+          'topic1', 
           self.listener_callback, 
           100)
-        self.subscription # prevent unused variable warning
-
+        self.subscription_2 = self.create_subscription(
+          String, 
+          'topic2', 
+          self.listener_callback, 
+          100)
+        self.subscription_3 = self.create_subscription(
+          String, 
+          'topic3', 
+          self.listener_callback, 
+          100)
+        self.subscription_4 = self.create_subscription(
+          String, 
+          'topic4', 
+          self.listener_callback, 
+          100)
+        self.subscription_1 # prevent unused variable warning
+        self.subscription_2 # prevent unused variable warning
+        self.subscription_3 # prevent unused variable warning
+        self.subscription_4 # prevent unused variable warning
 
 
 
@@ -64,9 +84,9 @@ class testNode(Node):
         if self.sent %100 == 0:
             self.data_point_num += 1.0
             print('time', self.total_time / float(self.sent), 'rate', self.received/self.sent, 'missed', self.false)
-            cpu_usage = self.python_process.cpu_percent()
-            print('cpu usage', cpu_usage)
-            self.avg_cpu += cpu_usage
+            #cpu_usage = self.python_process.cpu_percent()
+            #print('cpu usage', cpu_usage)
+            #self.avg_cpu += cpu_usage
             memoryUse = self.python_process.memory_info()[0]/2.**20  
             print('memory use:', memoryUse)
             self.avg_mem += memoryUse
@@ -74,7 +94,8 @@ class testNode(Node):
             print("Final Result")
             print("-------------------------------------------------------------")
             print('time', self.total_time / float(self.sent), 'rate', self.received/self.sent, 'missed', self.false)
-            print('avg cpu', self.avg_cpu / self.data_point_num, 'avg mem', self.avg_mem / self.data_point_num)
+            cpu_usage = self.python_process.cpu_percent()
+            print('avg cpu', cpu_usage, 'avg mem', self.avg_mem / self.data_point_num)
             self.destroy_node()
             
         
@@ -89,7 +110,10 @@ class testNode(Node):
         
     def timer_callback(self):
         self.msg.data = self.get_random_string(1024)
-        self.publisher_.publish(self.msg)
+        self.publisher_1.publish(self.msg)
+        self.publisher_2.publish(self.msg)
+        self.publisher_3.publish(self.msg)
+        self.publisher_4.publish(self.msg)
         # self.get_logger().info('Publishing: "%s"' % msg.data)
         self.sent += 1
         self.send_time = time.time()
