@@ -237,3 +237,22 @@ def main(args=None):
 if __name__ == '__main__':
     main()
 ```
+
+
+
+# Setup Security Files for Perf_test
+
+```
+cd ~/sros2_demo
+ros2 security create_keystore demo_keys
+
+ros2 security create_key demo_keys /talker_listener/testNode
+
+export ROS_SECURITY_KEYSTORE=~/sros2_demo/demo_keys
+export ROS_SECURITY_ENABLE=true
+export ROS_SECURITY_STRATEGY=Enforce
+```
+Then 
+```
+ros2 run demo_nodes_cpp talker --ros-args --enclave /talker_listener/talker
+```
