@@ -2,4 +2,5 @@
 ecdsa~=0.17.0
 M2Crypto~=0.38.0
 eciespy~=0.3.10
+psutil~=5.8.0
 
