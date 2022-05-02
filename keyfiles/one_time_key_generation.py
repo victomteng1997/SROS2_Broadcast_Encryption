@@ -2,32 +2,43 @@ from ecies.utils import generate_eth_key
 from ecies import encrypt, decrypt
 import binascii
 import os
+import sys
 
-for i in range(0,3):
-    privKey = generate_eth_key()
-    privKeyHex = privKey.to_hex()
-    pubKeyHex = privKey.public_key.to_hex()
-    priv_key_file = str(i) + "_key.pem"
-    public_key_file = str(i) + "_public.pem"
-    with open(priv_key_file, 'w') as f:
-        f.write(privKeyHex)
-    with open(public_key_file, 'w') as f:
-        f.write(pubKeyHex)
+def generate_keys(i):
+    for i in range(0,3):
+        privKey = generate_eth_key()
+        privKeyHex = privKey.to_hex()
+        pubKeyHex = privKey.public_key.to_hex()
+        priv_key_file = str(i) + "_key.pem"
+        public_key_file = str(i) + "_public.pem"
+        with open(priv_key_file, 'w') as f:
+            f.write(privKeyHex)
+        with open(public_key_file, 'w') as f:
+            f.write(pubKeyHex)
 
-with open("0_key.pem", 'r') as f:
-    privKeyHex = f.read()
 
-with open("0_public.pem", 'r') as f:
-    pubKeyHex = f.read()
+if __name__ == "__main__":
+    arguments = sys.argv[1:]
+    if len(arguments) == 2:
+        i = arguments[1]
+    else:
+        i = 3
+    generate_keys(i)
+    
+    with open("0_key.pem", 'r') as f:
+        privKeyHex = f.read()
 
-print("Encryption public key:", pubKeyHex)
-print("Decryption private key:", privKeyHex)
+    with open("0_public.pem", 'r') as f:
+        pubKeyHex = f.read()
 
-plaintext = os.urandom(1000)
-print("Plaintext:", plaintext)
+    print("Encryption public key:", pubKeyHex)
+    print("Decryption private key:", privKeyHex)
 
-encrypted = encrypt(pubKeyHex, plaintext)
-print("Encrypted:", binascii.hexlify(encrypted))
+    plaintext = os.urandom(1000)
+    print("Plaintext:", plaintext)
 
-decrypted = decrypt(privKeyHex, encrypted)
-print("Decrypted:", decrypted)
+    encrypted = encrypt(pubKeyHex, plaintext)
+    print("Encrypted:", binascii.hexlify(encrypted))
+
+    decrypted = decrypt(privKeyHex, encrypted)
+    print("Decrypted:", decrypted)

@@ -11,19 +11,20 @@ import string
 import hashlib
 import pickle
 import codecs
+import sys
 
 
 
 class EfficientBroadcastEncryption():
     def __init__(self):
-        # TODO: load two sets of public key system
         self.g = 2
+        self.a = 5
 
     def encrypt(self, M, S):
         ## 1. sig-gen
         sk = SigningKey.generate()  #
         vk = sk.verifying_key
-        print(vk.to_string())
+        #print(vk.to_string())
 
         ## 2. choose a random symmetric K.
         key = os.urandom(32)
@@ -38,7 +39,7 @@ class EfficientBroadcastEncryption():
         ## 4. for each pk in S, Cpk encrypt
         cpk_dic = {}
         for (pk, a) in S:
-            # TODO: discuss on the methods to distribute a value. For each public key system, g**a should be known
+            print("encrypting for receivers:", pk)
             gar = str(self.g**(a*r)).encode()
             # print('gar:', gar)
             m = hashlib.sha256()
@@ -67,34 +68,37 @@ class EfficientBroadcastEncryption():
 
         return ciphertext
 
-    def decrypt(self, ciphertext):
+    def decrypt(self, ciphertext, private_key):
         # parser
         ciphertext_byte = ciphertext.encode()
+        pk_file = private_key[0]
+        a = private_key[1]
         [sigma, T, C1, C2] = pickle.loads(codecs.decode(ciphertext_byte, "base64"))
         m = hashlib.sha256()
-        m.update(str(T**5).encode())
+        m.update(str(T**a).encode())
         hash_l = m.digest()
         C1_list = pickle.loads(C1)
+        cj = False
         for _cj in C1_list:
             if hash_l in _cj:
                 cj = _cj[len(hash_l):]
         if not cj:
             # message is not for this recipient. Return False
+            print("message is not for", pk_file)
             return False
         try:
-            p = ecc_decrypt('keyfiles/0_key.pem', cj)
+            p = ecc_decrypt(pk_file, cj)
         except:
             # decryption failed
             return False
 
         ## parse p as vk||x||K
-        # TODO: for current implementation, len(vk) is 48 and len(K) = 32. Need to confirm later.
         vk_string = p[0:48]
         x = p[48:-48]
         K = p[-48:-16]
         iv = p[-16:]
-        if not x == str(T**5).encode():
-            print("T fail")
+        if not x == str(T**a).encode():
+            #print("T fail")
             return False
         try:
             vk = VerifyingKey.from_string(vk_string)
@@ -104,7 +108,7 @@ class EfficientBroadcastEncryption():
             result = Mdecryptor.update(C2) + Mdecryptor .finalize()
             return result
         except: # assert error or final decrypt error.
-            print("vk fail")
+            #print("vk fail")
             return False
 
 
@@ -121,17 +125,23 @@ def cipher_plain_ratio_unit_test():
         EncryptionModel = EfficientBroadcastEncryption()
         ciphertext = EncryptionModel.encrypt(M, S)
         result = EncryptionModel.decrypt(ciphertext)
-        print(len(ciphertext), i)
-
-cipher_plain_ratio_unit_test()
-
-S = [('keyfiles/0_public.pem', 5),('keyfiles/1_public.pem', 6)] # test public key
-M = b"message_to_encrypt"
-
-EncryptionModel = EfficientBroadcastEncryption()
-ciphertext = EncryptionModel.encrypt(M, S)
-
-
-result = EncryptionModel.decrypt(ciphertext)
-
-print(result)
+        #print(len(ciphertext), i)
+        
+        
+if __name__ == "__main__":
+    #cipher_plain_ratio_unit_test()
+    S = [('keyfiles/0_public.pem', 5),('keyfiles/1_public.pem', 6)] # public keys. Noted that each key should be binded with a pre-defined fix value "a", distributed together with the key. If not provided, a default value will be used.
+    Private_Keys = [('keyfiles/0_key.pem', 5),('keyfiles/1_key.pem', 6)] # private keys.
+    
+    arguments = sys.argv[1:]
+    if len(arguments) > 0:
+        M = arguments[0].encode()
+    else:
+        M = b"message_to_encrypt"
+    
+    EncryptionModel = EfficientBroadcastEncryption()
+    ciphertext = EncryptionModel.encrypt(M, S)
+    for private_key in Private_Keys:
+        print("decrypting message with private_key:", private_key[0])
+        result = EncryptionModel.decrypt(ciphertext, private_key)
+        print(result)
